@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow | Aesthetic Workspace</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --surface: #131b2e;
+            --surface-card: rgba(23, 32, 54, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.18);
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            --accent-focus: #6366f1;
+            --accent-focus-glow: rgba(99, 102, 241, 0.25);
+            --accent-short: #10b981;
+            --accent-long: #3b82f6;
+            
+            --current-accent: var(--accent-focus);
+            --current-glow: var(--accent-focus-glow);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.5rem 1.5rem;
+            background-image: 
+                radial-gradient(circle at 50% 0%, var(--current-glow) 0%, transparent 60%);
+            transition: background 0.5s ease;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 860px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--current-accent), #a855f7);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 4px 20px var(--current-glow);
+        }
+
+        .brand-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            color: var(--text-main);
+            border-color: var(--border-hover);
+        }
+
+        /* Layout Grid */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .layout-grid {
+                grid-template-columns: 1.1fr 0.9fr;
+            }
+        }
+
+        /* Cards UI */
+        .card {
+            background: var(--surface-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Timer Section */
+        .timer-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.35rem;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            gap: 0.25rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.65rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tab-btn.active {
+            background: var(--current-accent);
+            color: #ffffff;
+            box-shadow: 0 4px 14px var(--current-glow);
+        }
+
+        .timer-display-box {
+            text-align: center;
+            margin: 2.5rem 0 1.5rem 0;
+        }
+
+        .timer-clock {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 5.5rem;
+            font-weight: 700;
+            letter-spacing: -3px;
+            color: var(--text-main);
+            line-height: 1;
+        }
+
+        .timer-status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .timer-status span {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--current-accent);
+            transition: width 1s linear;
+        }
+
+        .timer-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--current-accent);
+            color: #ffffff;
+            border: none;
+            padding: 0.9rem 2.8rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px var(--current-glow);
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.9rem 1.4rem;
+            font-weight: 600;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            color: var(--text-main);
+            border-color: var(--border-hover);
+        }
+
+        /* Soundscape UI */
+        .card-header {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sound-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .sound-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.85rem 1.1rem;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .sound-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .sound-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .volume-slider {
+            width: 75px;
+            accent-color: var(--current-accent);
+            cursor: pointer;
+        }
+
+        .play-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: var(--text-muted);
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .play-btn.playing {
+            background: var(--current-accent);
+            color: white;
+            box-shadow: 0 4px 12px var(--current-glow);
+        }
+
+        /* Tasks UI */
+        .task-input-box {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .task-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .task-input:focus {
+            border-color: var(--current-accent);
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.88rem;
+        }
+
+        .task-item.active-task {
+            border-color: var(--current-accent);
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        /* Stats Grid */
+        .stats-wrapper {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            padding: 0.85rem;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--current-accent);
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 0.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <div class="brand-name">FocusFlow</div>
+            </div>
+            <div class="header-controls">
+                <button class="icon-btn" id="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="layout-grid">
+            
+            <!-- Left Side: Timer & Tasks -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Timer Card -->
+                <div class="card">
+                    <div class="timer-tabs">
+                        <button class="tab-btn active" data-mode="focus">Focus (25m)</button>
+                        <button class="tab-btn" data-mode="short">Short Break (5m)</button>
+                        <button class="tab-btn" data-mode="long">Long Break (15m)</button>
+                    </div>
+
+                    <div class="timer-display-box">
+                        <div class="timer-clock" id="timer-clock">25:00</div>
+                        <div class="timer-status">
+                            <span>Target Task:</span> <span id="current-task-display">General Deep Work</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+
+                    <div class="timer-actions">
+                        <button class="btn-primary" id="start-btn">Start Session</button>
+                        <button class="btn-secondary" id="reset-btn">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Tasks Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>Today's Tasks</span>
+                    </div>
+                    <div class="task-input-box">
+                        <input type="text" class="task-input" id="task-input" placeholder="What are you working on?" />
+                        <button class="btn-secondary" id="add-task-btn">Add</button>
+                    </div>
+                    <div class="task-list" id="task-list"></div>
+                </div>
+            </div>
+
+            <!-- Right Side: Ambient Sounds & Stats -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Ambient Soundscape -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>Ambient Soundscape</span>
+                    </div>
+                    <div class="sound-grid">
+                        <div class="sound-card">
+                            <div class="sound-title">🌧️ Heavy Rain</div>
+                            <div class="sound-controls">
+                                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5" data-sound="rain">
+                                <button class="play-btn" data-sound="rain">▶</button>
+                            </div>
+                        </div>
+                        <div class="sound-card">
+                            <div class="sound-title">☕ Cozy Cafe</div>
+                            <div class="sound-controls">
+                                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5" data-sound="cafe">
+                                <button class="play-btn" data-sound="cafe">▶</button>
+                            </div>
+                        </div>
+                        <div class="sound-card">
+                            <div class="sound-title">🌊 Ocean Waves</div>
+                            <div class="sound-controls">
+                                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="0.5" data-sound="waves">
+                                <button class="play-btn" data-sound="waves">▶</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>Daily Productivity</span>
+                    </div>
+                    <div class="stats-wrapper">
+                        <div class="stat-box">
+                            <div class="stat-value" id="stat-sessions">0</div>
+                            <div class="stat-label">Sessions</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="stat-hours">0.0</div>
+                            <div class="stat-label">Hours</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="stat-tasks">0</div>
+                            <div class="stat-label">Done</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer>
+            FocusFlow • Designed for Deep Work & Concentration
+        </footer>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        // App State
+        const modes = { focus: 25 * 60, short: 5 * 60, long: 15 * 60 };
+        let currentMode = 'focus';
+        let timeLeft = modes[currentMode];
+        let timerInterval = null;
+        let isRunning = false;
+
+        let stats = JSON.parse(localStorage.getItem('focusflow_v2_stats')) || { sessions: 0, minutes: 0, tasksDone: 0 };
+        let tasks = JSON.parse(localStorage.getItem('focusflow_v2_tasks')) || [];
+
+        // DOM Elements
+        const clockEl = document.getElementById('timer-clock');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const progressFill = document.getElementById('progress-fill');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+
+        // Update Display
+        function updateClock() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            clockEl.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            
+            const total = modes[currentMode];
+            const pct = ((total - timeLeft) / total) * 100;
+            progressFill.style.width = `${pct}%`;
+            document.title = `${clockEl.textContent} - FocusFlow`;
+        }
+
+        // Timer Controls
+        function startTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                startBtn.textContent = 'Resume Session';
+                isRunning = false;
+                return;
+            }
+
+            isRunning = true;
+            startBtn.textContent = 'Pause';
+
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateClock();
+                } else {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    startBtn.textContent = 'Start Session';
+
+                    if (currentMode === 'focus') {
+                        stats.sessions++;
+                        stats.minutes += 25;
+                        saveStats();
+                    }
+                    alert('Session complete! Time to rest.');
+                    resetTimer();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            startBtn.textContent = 'Start Session';
+            timeLeft = modes[currentMode];
+            updateClock();
+        }
+
+        // Switch Modes
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+
+                const root = document.documentElement;
+                if (currentMode === 'focus') {
+                    root.style.setProperty('--current-accent', 'var(--accent-focus)');
+                    root.style.setProperty('--current-glow', 'var(--accent-focus-glow)');
+                } else if (currentMode === 'short') {
+                    root.style.setProperty('--current-accent', 'var(--accent-short)');
+                    root.style.setProperty('--current-glow', 'rgba(16, 185, 129, 0.25)');
+                } else {
+                    root.style.setProperty('--current-accent', 'var(--accent-long)');
+                    root.style.setProperty('--current-glow', 'rgba(59, 130, 246, 0.25)');
+                }
+
+                resetTimer();
+            });
+        });
+
+        startBtn.addEventListener('click', startTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        // Web Audio Synthesizer (Better Sound Engine)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const activeSounds = {};
+
+        function createAmbientSound(type) {
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            noise.loop = true;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = type === 'rain' ? 'lowpass' : 'bandpass';
+            filter.frequency.value = type === 'rain' ? 800 : 400;
+
+            const gain = audioCtx.createGain();
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            return { noise, gain };
+        }
+
+        document.querySelectorAll('.play-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const sound = btn.dataset.sound;
+                const slider = document.querySelector(`.volume-slider[data-sound="${sound}"]`);
+
+                if (activeSounds[sound]) {
+                    activeSounds[sound].noise.stop();
+                    delete activeSounds[sound];
+                    btn.classList.remove('playing');
+                    btn.textContent = '▶';
+                } else {
+                    const soundObj = createAmbientSound(sound);
+                    soundObj.gain.gain.value = slider.value;
+                    soundObj.noise.start();
+                    activeSounds[sound] = soundObj;
+                    btn.classList.add('playing');
+                    btn.textContent = '❚❚';
+                }
+            });
+        });
+
+        document.querySelectorAll('.volume-slider').forEach(slider => {
+            slider.addEventListener('input', () => {
+                const sound = slider.dataset.sound;
+                if (activeSounds[sound]) {
+                    activeSounds[sound].gain.gain.value = slider.value;
+                }
+            });
+        });
+
+        // Tasks System
+        function renderTasks() {
+            const list = document.getElementById('task-list');
+            list.innerHTML = '';
+            tasks.forEach((t, i) => {
+                const item = document.createElement('div');
+                item.className = 'task-item';
+                item.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${i})">
+                        <span style="${t.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}">${t.text}</span>
+                    </div>
+                    <button onclick="deleteTask(${i})" style="background:none; border:none; color:#ef4444; cursor:pointer;">✕</button>
+                `;
+                list.appendChild(item);
+            });
+            localStorage.setItem('focusflow_v2_tasks', JSON.stringify(tasks));
+        }
+
+        document.getElementById('add-task-btn').addEventListener('click', () => {
+            const input = document.getElementById('task-input');
+            if (input.value.trim()) {
+                tasks.push({ text: input.value.trim(), done: false });
+                document.getElementById('current-task-display').textContent = input.value.trim();
+                input.value = '';
+                renderTasks();
+            }
+        });
+
+        window.toggleTask = function(i) {
+            tasks[i].done = !tasks[i].done;
+            if (tasks[i].done) stats.tasksDone++;
+            saveStats();
+            renderTasks();
+        };
+
+        window.deleteTask = function(i) {
+            tasks.splice(i, 1);
+            renderTasks();
+        };
+
+        function saveStats() {
+            localStorage.setItem('focusflow_v2_stats', JSON.stringify(stats));
+            document.getElementById('stat-sessions').textContent = stats.sessions;
+            document.getElementById('stat-hours').textContent = (stats.minutes / 60).toFixed(1);
+            document.getElementById('stat-tasks').textContent = stats.tasksDone;
+        }
+
+        document.getElementById('fullscreen-btn').addEventListener('click', () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        });
+
+        // Init
+        updateClock();
+        renderTasks();
+        saveStats();
+    </script>
+</body>
+</html>
